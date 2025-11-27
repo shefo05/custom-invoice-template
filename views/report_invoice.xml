@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    
+    <record id="account.account_invoices" model="ir.actions.report">
+        <field name="name">Invoices</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">custom_invoice_template.report_invoice_custom</field>
+        <field name="report_file">custom_invoice_template.report_invoice_custom</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_invoice_custom">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.basic_layout">
+                    <div class="page">
+                        <style>
+                            .invoice-title {
+                                font-size: 36px;
+                                font-weight: bold;
+                                color: #999;
+                                text-align: right;
+                                margin-bottom: 20px;
+                            }
+                            .invoice-info-table {
+                                width: 100%;
+                                margin-bottom: 30px;
+                            }
+                            .invoice-info-box {
+                                background-color: #e8e8e8;
+                                padding: 8px;
+                                font-weight: bold;
+                                text-align: center;
+                                border: 1px solid #ccc;
+                            }
+                            .invoice-info-value {
+                                padding: 8px;
+                                text-align: center;
+                                border: 1px solid #ccc;
+                            }
+                            .address-box {
+                                background-color: #e8e8e8;
+                                padding: 10px;
+                                margin-bottom: 20px;
+                                border: 1px solid #ccc;
+                            }
+                            .address-title {
+                                font-weight: bold;
+                                margin-bottom: 5px;
+                            }
+                            .items-table {
+                                width: 100%;
+                                border-collapse: collapse;
+                                margin-bottom: 20px;
+                            }
+                            .items-table th {
+                                background-color: #e8e8e8;
+                                padding: 10px;
+                                text-align: left;
+                                border: 1px solid #ccc;
+                                font-weight: bold;
+                            }
+                            .items-table td {
+                                padding: 10px;
+                                border: 1px solid #ccc;
+                            }
+                            .text-right {
+                                text-align: right;
+                            }
+                            .thank-you {
+                                text-align: center;
+                                font-style: italic;
+                                margin-top: 30px;
+                            }
+                        </style>
+
+                        <div style="margin-bottom: 20px;">
+                            <div><strong><span t-field="o.company_id.name"/></strong></div>
+                            <div><span t-field="o.company_id.street"/></div>
+                            <div>
+                                <span t-field="o.company_id.city"/><t t-if="o.company_id.state_id">, <span t-field="o.company_id.state_id.code"/></t>
+                                <t t-if="o.company_id.zip"> <span t-field="o.company_id.zip"/></t>
+                            </div>
+                            <div t-if="o.company_id.phone">Phone: <span t-field="o.company_id.phone"/></div>
+                        </div>
+
+                        <div class="invoice-title">INVOICE</div>
+
+                        <table class="invoice-info-table">
+                            <tr>
+                                <td style="width: 60%;"></td>
+                                <td class="invoice-info-box" style="width: 20%;">INVOICE #</td>
+                                <td class="invoice-info-box" style="width: 20%;">DATE</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="invoice-info-value"><span t-field="o.name"/></td>
+                                <td class="invoice-info-value"><span t-field="o.invoice_date"/></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="invoice-info-box">CUSTOMER ID</td>
+                                <td class="invoice-info-box">TERMS</td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td class="invoice-info-value"><span t-field="o.partner_id.id"/></td>
+                                <td class="invoice-info-value">
+                                    <span t-if="o.invoice_payment_term_id" t-field="o.invoice_payment_term_id.name"/>
+                                    <span t-else="">Net 30 Days</span>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table style="width: 100%; margin-bottom: 30px;">
+                            <tr>
+                                <td style="width: 48%; vertical-align: top;">
+                                    <div class="">
+                                        <div class="address-title address-box">BILL TO</div>
+                                        <div>[Name]</div>
+                                        <div><span t-field="o.partner_id.name"/></div>
+                                        <div t-if="o.partner_id.street"><span t-field="o.partner_id.street"/></div>
+                                        <div>
+                                            <span t-if="o.partner_id.city" t-field="o.partner_id.city"/>
+                                            <t t-if="o.partner_id.state_id">, <span t-field="o.partner_id.state_id.code"/></t>
+                                            <t t-if="o.partner_id.zip"> <span t-field="o.partner_id.zip"/></t>
+                                        </div>
+                                        <div t-if="o.partner_id.phone"><span t-field="o.partner_id.phone"/></div>
+                                        <div t-if="o.partner_id.email"><span t-field="o.partner_id.email"/></div>
+                                    </div>
+                                </td>
+                                <td style="width: 4%;"></td>
+                                <td style="width: 48%; vertical-align: top;">
+                                    <div class="">
+                                        <div class="address-title address-box">SHIP TO</div>
+                                        <div>[Name]</div>
+                                        <div><span t-field="o.partner_id.name"/></div>
+                                        <div t-if="o.partner_id.street"><span t-field="o.partner_id.street"/></div>
+                                        <div>
+                                            <span t-if="o.partner_id.city" t-field="o.partner_id.city"/>
+                                            <t t-if="o.partner_id.state_id">, <span t-field="o.partner_id.state_id.code"/></t>
+                                            <t t-if="o.partner_id.zip"> <span t-field="o.partner_id.zip"/></t>
+                                        </div>
+                                        <div t-if="o.partner_id.phone"><span t-field="o.partner_id.phone"/></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50%;">DESCRIPTION</th>
+                                    <th style="width: 10%;" class="text-right">QTY</th>
+                                    <th style="width: 20%;" class="text-right">UNIT PRICE</th>
+                                    <th style="width: 20%;" class="text-right">AMOUNT</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="o.invoice_line_ids" t-as="line">
+                                    <tr>
+                                        <td><span t-field="line.name"/></td>
+                                        <td class="text-right"><span t-field="line.quantity"/></td>
+                                        <td class="text-right"><span t-field="line.price_unit"/></td>
+                                        <td class="text-right"><span t-field="line.price_subtotal"/></td>
+                                    </tr>
+                                </t>
+                                <tr>
+                                    <td style="border: none;">&#160;</td>
+                                    <td style="border: 1px solid #ccc;">-</td>
+                                    <td style="border: 1px solid #ccc;"></td>
+                                    <td style="border: 1px solid #ccc;">-</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: none;">&#160;</td>
+                                    <td style="border: 1px solid #ccc;">-</td>
+                                    <td style="border: 1px solid #ccc;"></td>
+                                    <td style="border: 1px solid #ccc;">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="thank-you">
+                            <em>Thank you for your business!</em>
+                        </div>
+
+                        <div style="text-align: right; margin-top: 20px;">
+                            <table style="float: right; width: 300px;">
+                                <tr>
+                                    <td style="font-weight: bold; font-size: 16px;">TOTAL</td>
+                                    <td style="font-weight: bold; font-size: 16px; text-align: right;">
+                                        <span t-field="o.amount_total"/>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div style="clear: both;"></div>
+                        </div>
+
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
