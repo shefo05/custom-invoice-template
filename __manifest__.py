@@ -7,6 +7,7 @@
     'depends': ['account', 'sale'],
     'data': [
         'views/report_invoice.xml',
+
     ],
     'installable': True,
     'application': False,
